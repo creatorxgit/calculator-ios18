@@ -10,7 +10,7 @@ class iOSCalculator:
         self.window.resizable(False, False)
         self.window.configure(bg='#000000')
         
-        # Переменные
+        # Variables
         self.current_input = "0"
         self.stored_value = None
         self.operation = None
@@ -18,7 +18,7 @@ class iOSCalculator:
         self.buttons = {}
         self.animation_running = {}
         
-        # Цвета в стиле iOS 26 (более яркие, с glassmorphism эффектом)
+        # Colors in iOS 26 style (brighter, with glassmorphism effect)
         self.colors = {
             'bg': '#000000',
             'display_bg': '#1C1C1E',
@@ -38,22 +38,22 @@ class iOSCalculator:
         self.setup_ui()
         
     def setup_ui(self):
-        # Основной контейнер с эффектом стекла
+        # Main container with glass effect
         self.main_frame = tk.Frame(self.window, bg=self.colors['bg'])
         self.main_frame.pack(fill='both', expand=True, padx=15, pady=20)
         
-        # Дисплей
+        # Display
         self.create_display()
         
-        # Кнопки
+        # Buttons
         self.create_buttons()
         
     def create_display(self):
-        # Контейнер дисплея с glassmorphism эффектом
+        # Display container with glassmorphism effect
         display_frame = tk.Frame(self.main_frame, bg=self.colors['bg'])
         display_frame.pack(fill='x', pady=(20, 30))
         
-        # Канвас для дисплея с закруглёнными углами
+        # Canvas for display with rounded corners
         self.display_canvas = tk.Canvas(
             display_frame, 
             width=350, 
@@ -63,7 +63,7 @@ class iOSCalculator:
         )
         self.display_canvas.pack()
         
-        # Закруглённый прямоугольник для дисплея
+        # Rounded rectangle for display
         self.create_rounded_rect(
             self.display_canvas, 
             5, 5, 345, 115, 
@@ -73,7 +73,7 @@ class iOSCalculator:
             width=1
         )
         
-        # Текст дисплея
+        # Display text
         self.display_text = self.display_canvas.create_text(
             330, 70,
             text="0",
@@ -82,7 +82,7 @@ class iOSCalculator:
             anchor='e'
         )
         
-        # Индикатор операции
+        # Operation indicator
         self.operation_indicator = self.display_canvas.create_text(
             330, 20,
             text="",
@@ -109,11 +109,11 @@ class iOSCalculator:
         return canvas.create_polygon(points, smooth=True, **kwargs)
     
     def create_buttons(self):
-        # Контейнер для кнопок
+        # Container for buttons
         buttons_frame = tk.Frame(self.main_frame, bg=self.colors['bg'])
         buttons_frame.pack(fill='both', expand=True)
         
-        # Раскладка кнопок
+        # Button layout
         button_layout = [
             [('C', 'function'), ('±', 'function'), ('%', 'function'), ('÷', 'operation')],
             [('7', 'number'), ('8', 'number'), ('9', 'number'), ('×', 'operation')],
@@ -131,7 +131,7 @@ class iOSCalculator:
             
             col_offset = 0
             for col_idx, (text, btn_type) in enumerate(row):
-                # Определяем ширину кнопки
+                # Determine button width
                 if btn_type == 'number_wide':
                     width = button_size * 2 + spacing
                     actual_type = 'number'
@@ -139,7 +139,7 @@ class iOSCalculator:
                     width = button_size
                     actual_type = btn_type
                 
-                # Создаём кнопку
+                # Create button
                 btn = self.create_ios_button(
                     row_frame, 
                     text, 
@@ -150,7 +150,7 @@ class iOSCalculator:
                 btn.pack(side='left', padx=spacing//2)
                 
     def create_ios_button(self, parent, text, width, height, btn_type):
-        # Определяем цвета
+        # Determine colors
         if btn_type == 'number':
             bg_color = self.colors['number']
             text_color = self.colors['number_text']
@@ -164,7 +164,7 @@ class iOSCalculator:
             text_color = self.colors['function_text']
             hover_color = self.colors['function_hover']
         
-        # Канвас для кнопки
+        # Canvas for button
         canvas = tk.Canvas(
             parent,
             width=width,
@@ -173,7 +173,7 @@ class iOSCalculator:
             highlightthickness=0
         )
         
-        # Закруглённая кнопка
+        # Rounded button
         btn_shape = self.create_rounded_rect(
             canvas,
             2, 2, width-2, height-2,
@@ -182,7 +182,7 @@ class iOSCalculator:
             outline=''
         )
         
-        # Эффект стекла (блик сверху)
+        # Glass effect (highlight on top)
         glass_effect = self.create_rounded_rect(
             canvas,
             4, 4, width-4, height//2,
@@ -191,7 +191,7 @@ class iOSCalculator:
             outline=''
         )
         
-        # Текст кнопки
+        # Button text
         font_size = 28 if len(text) == 1 else 22
         btn_text = canvas.create_text(
             width//2, height//2,
@@ -200,7 +200,7 @@ class iOSCalculator:
             font=('SF Pro Display', font_size, 'bold' if btn_type == 'operation' else 'normal')
         )
         
-        # Сохраняем информацию о кнопке
+        # Store button info
         self.buttons[text] = {
             'canvas': canvas,
             'shape': btn_shape,
@@ -215,7 +215,7 @@ class iOSCalculator:
         }
         self.animation_running[text] = False
         
-        # Привязываем события
+        # Bind events
         canvas.bind('<Enter>', lambda e, t=text: self.on_hover_enter(t))
         canvas.bind('<Leave>', lambda e, t=text: self.on_hover_leave(t))
         canvas.bind('<Button-1>', lambda e, t=text: self.on_press(t))
@@ -238,49 +238,49 @@ class iOSCalculator:
         btn = self.buttons[text]
         btn['pressed'] = True
         
-        # Анимация нажатия
+        # Press animation
         self.animate_press(text)
         
-        # Обработка нажатия
+        # Handle button press
         self.handle_button_press(text)
     
     def on_release(self, text):
         btn = self.buttons[text]
         btn['pressed'] = False
         
-        # Анимация отпускания
+        # Release animation
         self.animate_release(text)
     
     def animate_press(self, text):
-        """Анимация нажатия кнопки с эффектом масштабирования"""
+        """Button press animation with scaling effect"""
         btn = self.buttons[text]
         canvas = btn['canvas']
         
         self.animation_running[text] = True
         
-        # Подсветка при нажатии
+        # Highlight when pressed
         if btn['type'] == 'operation':
             canvas.itemconfig(btn['shape'], fill='#FFFFFF')
             canvas.itemconfig(btn['text'], fill=btn['bg_color'])
         else:
             canvas.itemconfig(btn['shape'], fill=btn['hover_color'])
         
-        # Эффект уменьшения
+        # Scale down effect
         self.scale_button(text, 0.92)
     
     def animate_release(self, text):
-        """Анимация отпускания кнопки"""
+        """Button release animation"""
         btn = self.buttons[text]
         canvas = btn['canvas']
         
-        # Возврат к нормальному размеру с анимацией
+        # Return to normal size with animation
         self.animate_scale_back(text, 0.92, 1.0, steps=5)
         
-        # Возврат цвета
+        # Restore color
         self.window.after(100, lambda: self.reset_button_color(text))
     
     def scale_button(self, text, scale):
-        """Масштабирование кнопки"""
+        """Scale button"""
         btn = self.buttons[text]
         canvas = btn['canvas']
         
@@ -293,7 +293,7 @@ class iOSCalculator:
         offset_x = (width - new_width) / 2
         offset_y = (height - new_height) / 2
         
-        # Удаляем старую форму и создаём новую
+        # Delete old shape and create new one
         canvas.delete(btn['shape'])
         btn['shape'] = self.create_rounded_rect(
             canvas,
@@ -304,11 +304,11 @@ class iOSCalculator:
             outline=''
         )
         
-        # Текст поверх
+        # Bring text to front
         canvas.tag_raise(btn['text'])
     
     def animate_scale_back(self, text, start_scale, end_scale, steps=5):
-        """Плавное возвращение к нормальному размеру"""
+        """Smooth return to normal size"""
         btn = self.buttons[text]
         canvas = btn['canvas']
         
@@ -319,7 +319,7 @@ class iOSCalculator:
             nonlocal current_scale
             if step >= steps:
                 self.animation_running[text] = False
-                # Финальная отрисовка
+                # Final rendering
                 canvas.delete(btn['shape'])
                 btn['shape'] = self.create_rounded_rect(
                     canvas,
@@ -338,13 +338,13 @@ class iOSCalculator:
         step_animation(0)
     
     def reset_button_color(self, text):
-        """Сброс цвета кнопки"""
+        """Reset button color"""
         btn = self.buttons[text]
         btn['canvas'].itemconfig(btn['shape'], fill=btn['bg_color'])
         btn['canvas'].itemconfig(btn['text'], fill=btn['text_color'])
     
     def handle_button_press(self, text):
-        """Обработка нажатия кнопки"""
+        """Handle button press"""
         if text.isdigit():
             self.input_digit(text)
         elif text == '.':
@@ -382,12 +382,12 @@ class iOSCalculator:
         self.stored_value = None
         self.operation = None
         self.should_reset = False
-        # Анимация очистки
+        # Clear animation
         self.animate_display_clear()
     
     def animate_display_clear(self):
-        """Анимация очистки дисплея"""
-        # Мигание дисплея
+        """Display clear animation"""
+        # Display blinking
         original_color = self.colors['display_text']
         
         def flash(step):
@@ -426,18 +426,18 @@ class iOSCalculator:
         self.operation = op
         self.should_reset = True
         
-        # Подсветка активной операции
+        # Highlight active operation
         self.highlight_operation(op)
     
     def highlight_operation(self, op):
-        """Подсветка активной кнопки операции"""
-        # Сброс всех операций
+        """Highlight active operation button"""
+        # Reset all operations
         for btn_text in ['÷', '×', '−', '+']:
             btn = self.buttons[btn_text]
             btn['canvas'].itemconfig(btn['shape'], fill=btn['bg_color'])
             btn['canvas'].itemconfig(btn['text'], fill='#FFFFFF')
         
-        # Подсветка текущей
+        # Highlight current
         btn = self.buttons[op]
         btn['canvas'].itemconfig(btn['shape'], fill='#FFFFFF')
         btn['canvas'].itemconfig(btn['text'], fill=btn['bg_color'])
@@ -468,25 +468,25 @@ class iOSCalculator:
             self.operation = None
             self.should_reset = True
             
-            # Сброс подсветки операций
+            # Reset operation highlights
             self.reset_operation_highlights()
             
-            # Анимация результата
+            # Result animation
             self.animate_result()
             
         except:
             self.current_input = "Error"
     
     def reset_operation_highlights(self):
-        """Сброс подсветки всех кнопок операций"""
+        """Reset all operation button highlights"""
         for op in ['÷', '×', '−', '+']:
             btn = self.buttons[op]
             btn['canvas'].itemconfig(btn['shape'], fill=btn['bg_color'])
             btn['canvas'].itemconfig(btn['text'], fill='#FFFFFF')
     
     def animate_result(self):
-        """Анимация появления результата"""
-        # Эффект пульсации
+        """Result appearance animation"""
+        # Pulsing effect
         original_size = 56
         
         def pulse(step, growing):
@@ -512,7 +512,7 @@ class iOSCalculator:
         pulse(0, True)
     
     def format_number(self, value):
-        """Форматирование числа для отображения"""
+        """Format number for display"""
         if value == int(value):
             formatted = str(int(value))
         else:
@@ -524,10 +524,10 @@ class iOSCalculator:
         return formatted
     
     def update_display(self):
-        """Обновление дисплея с анимацией"""
+        """Update display with animation"""
         display_value = self.current_input
         
-        # Адаптивный размер шрифта
+        # Adaptive font size
         if len(display_value) > 7:
             font_size = max(32, 56 - (len(display_value) - 7) * 4)
         else:
@@ -539,7 +539,7 @@ class iOSCalculator:
             font=('SF Pro Display', font_size, 'normal')
         )
         
-        # Обновление индикатора операции
+        # Update operation indicator
         if self.operation:
             op_text = f"{self.format_number(self.stored_value)} {self.operation}"
             self.display_canvas.itemconfig(self.operation_indicator, text=op_text)
@@ -547,7 +547,7 @@ class iOSCalculator:
             self.display_canvas.itemconfig(self.operation_indicator, text="")
     
     def run(self):
-        # Попытка установить иконку и настройки окна
+        # Try to set icon and window settings
         try:
             self.window.attributes('-alpha', 0.0)
             self.fade_in()
@@ -557,7 +557,7 @@ class iOSCalculator:
         self.window.mainloop()
     
     def fade_in(self):
-        """Анимация появления окна"""
+        """Window appearance animation"""
         alpha = 0.0
         
         def step():
@@ -572,7 +572,7 @@ class iOSCalculator:
         
         step()
 
-# Запуск калькулятора
+# Run calculator
 if __name__ == "__main__":
     calculator = iOSCalculator()
     calculator.run()
